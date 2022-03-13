@@ -130,3 +130,151 @@ docker pull k8s.gcr.io/pause:3.6
 #OR Run:
 kubeadm config images pull
 ```
+
+3. Install and configure CEPH as storage-class
+
+#Quick Install (Operator-Cluser-SC-PV-PVC):
+
+#################################################################################
+```bash
+git clone https://github.com/rfinland/rook-ceph-charts.git
+cd ~/rook-ceph-charts/
+chmod +x rook-ceph.sh
+./rook-ceph.sh
+```
+#################################################################################
+
+
+
+#Istall ROOK Operator chart:
+
+#################################################################################
+```bash
+git clone https://github.com/rfinland/rook-ceph-charts.git
+cd ~/rook-ceph-charts/rook-ceph/
+helm install --create-namespace --namespace rook-ceph rook-ceph . -f values.yaml
+```
+#################################################################################
+
+#chackout:
+```bash
+kubectl --namespace rook-ceph get pods -l "app=rook-ceph-operator"
+```
+
+#Istall ROOK Cluster chart:
+
+#################################################################################
+```bash
+git clone https://github.com/rfinland/rook-ceph-charts.git
+cd ~/rook-ceph-charts/rook-ceph-cluster/
+helm install --namespace rook-ceph rook-ceph-cluster . -f values.yaml
+```
+#################################################################################
+
+#chackout:
+```bash
+kubectl --namespace rook-ceph get cephcluster
+```
+#Install StorageClass,PV,PVC:
+
+#################################################################################
+```bash
+cd ~/rook-ceph-charts/
+kubectl create -f sc-pv-pvc-ceph-block.yaml -n  rook-ceph
+```
+#################################################################################
+
+#Checkout:
+```bash
+kubectl get sc,pv,pvc -n rook-ceph
+```
+
+4. Deploy Nginx Ingress
+
+#################################################################################
+```bash
+git clone https://github.com/rfinland/ingress-sample.git
+cd ~/ingress-sample
+chmod +x ingress-app.sh
+./ingress-app.sh
+```
+#################################################################################
+
+#Curl the app:
+```bash
+curl http://demo.localdev.me:8080/
+```
+
+
+5. Install Prometheus, Grafana to k8s cluster (Monitoring ETCD is mandatory)
+
+#################################################################################
+```bash
+git clone https://github.com/rfinland/loki.git
+cd ~/loki
+chmod +x grafana.sh
+./grafana.sh
+```
+#################################################################################
+Admin Password and port-forwarding have been done in grafana.sh as well.
+
+(Monitoring ETCD is mandatory)
+```bash
+visit: http://localhost:3000/dashboard/import?orgId=1
+DashboardID = 3070
+For Mariadb = 13106
+```
+```bash
+--set-file extraScrapeConfigs=extraScrapeConfigs.yaml
+cat > $PWD/test-etcd.yaml <<EOF
+global:
+  scrape_interval: 10s
+scrape_configs:
+  - job_name: test-etcd
+    static_configs:
+    - targets: ['185.1.1.2:2379','185.1.1.3:2379','185.1.1.4:2379']
+EOF
+cat $PWD/test-etcd.yaml
+```
+
+6. Install three node MariaDB galera cluster to k8s cluster
+
+#################################################################################
+```bash
+git clone https://github.com/rfinland/Mariadb.git
+cd ~/Mariadb/
+chmod +x mariadb.sh
+./mariadb.sh
+```
+#################################################################################
+
+#Password:
+```bash
+echo "$(kubectl get secret --namespace mariadb-galera mariadb-galera -o jsonpath="{.data.mariadb-root-password}" | base64 --decode)"
+```
+
+To connect to your database run the following command:
+```bash
+    kubectl run mariadb-galera-client --rm --tty -i --restart='Never' --namespace mariadb-galera --image docker.io/bitnami/mariadb-galera:10.6.7-debian-10-r17 --command \
+      -- mysql -h mariadb-galera -P  -uroot -p$(kubectl get secret --namespace mariadb-galera mariadb-galera -o jsonpath="{.data.mariadb-root-password}" | base64 --decode) my_database
+```
+To connect to your database from outside the cluster execute the following commands:
+```bash
+    kubectl port-forward --namespace mariadb-galera svc/mariadb-galera : &
+    mysql -h 127.0.0.1 -P  -uroot -p$(kubectl get secret --namespace mariadb-galera mariadb-galera -o jsonpath="{.data.mariadb-root-password}" | base64 --decode) my_database
+```
+To upgrade this helm chart:
+```bash
+    helm upgrade --namespace mariadb-galera mariadb-galera bitnami/mariadb-galera \
+      --set rootUser.password=$(kubectl get secret --namespace mariadb-galera mariadb-galera -o jsonpath="{.data.mariadb-root-password}" | base64 --decode) \
+      --set db.name=my_database \
+      --set galera.mariabackup.password=$(kubectl get secret --namespace mariadb-galera mariadb-galera -o jsonpath="{.data.mariadb-galera-mariabackup-password}" | base64 --decode)
+```
+```bash
+# helm delete --purge  mariadb
+# k label node workertwo app=master
+# k label node workertwo  app.kubernetes.io/name=mariadb-galera
+# SET/REMOVE  DAFAULT SC: 
+# kubectl patch storageclass local-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+# kubectl patch storageclass ceph-block -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+```
