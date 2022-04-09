@@ -55,10 +55,10 @@ curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bas
 ```
 
 Let's Initial with this command:
-#kubeadm init --control-plane-endpoint="<LO IP>:6443" --upload-certs --apiserver-advertise-address=<Master IP> --pod-network-cidr=192.168.0.0/16
+#kubeadm init --control-plane-endpoint="<LO IP>:8443" --upload-certs --apiserver-advertise-address=<Master IP> --pod-network-cidr=192.168.0.0/16
 Set <LO IP> and your current Master node ip (in my case Master1(mone)IP ):
 ```bash
-kubeadm init --control-plane-endpoint="185.1.1.1:6443" --upload-certs --apiserver-advertise-address=185.1.1.2 --pod-network-cidr=192.168.0.0/16
+kubeadm init --control-plane-endpoint="185.1.1.1:8443" --upload-certs --apiserver-advertise-address=185.1.1.2 --pod-network-cidr=192.168.0.0/16
 ```
 Export the kubeconfig:
 ```bash
@@ -84,11 +84,11 @@ kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectca
 Master joining command (in my case):
 You can now join any number of the control-plane node running the following command on each as root:
 NOTICE: You have to add your new master node to your haproxy on your lo node:
-Like: "	server mthree 185.1.1.4:6443 check fall 3 rise 2 " and then run systemctl restart haproxy.
+Like: "	server mthree 185.1.1.4:8443 check fall 3 rise 2 " and then run systemctl restart haproxy.
 
 ```bash
 
-kubeadm join 185.1.1.1:6443 --token pe9bdq.8n5xuaz87w8i3fft \
+kubeadm join 185.1.1.1:8443 --token pe9bdq.8n5xuaz87w8i3fft \
         --discovery-token-ca-cert-hash sha256:4ee54ab2ccec2b108d1e572856708656345a589c107f7ca3867ddfc70b469a08 \
         --control-plane --certificate-key 07a361d17c0398683f61cfac174aafff100a0a4505d67605ff59afecfb35bee4
 
@@ -99,7 +99,7 @@ Worker joining command(in my case):
 You can join any number of worker nodes by running the following on each as root:
 ```bash
 
-kubeadm join 185.1.1.1:6443 --token pe9bdq.8n5xuaz87w8i3fft \
+kubeadm join 185.1.1.1:8443 --token pe9bdq.8n5xuaz87w8i3fft \
         --discovery-token-ca-cert-hash sha256:4ee54ab2ccec2b108d1e572856708656345a589c107f7ca3867ddfc70b469a08
 ```
 
