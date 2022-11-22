@@ -137,7 +137,7 @@ kubeadm config images pull
 
 #################################################################################
 ```bash
-git clone https://github.com/rfinland/rook-ceph-charts.git
+git clone https://github.com/rfatolahzade/rook-ceph-charts.git
 cd ~/rook-ceph-charts/
 chmod +x rook-ceph.sh
 ./rook-ceph.sh
@@ -150,7 +150,7 @@ chmod +x rook-ceph.sh
 
 #################################################################################
 ```bash
-git clone https://github.com/rfinland/rook-ceph-charts.git
+git clone https://github.com/rfatolahzade/rook-ceph-charts.git
 cd ~/rook-ceph-charts/rook-ceph/
 helm install --create-namespace --namespace rook-ceph rook-ceph . -f values.yaml
 ```
@@ -165,7 +165,7 @@ kubectl --namespace rook-ceph get pods -l "app=rook-ceph-operator"
 
 #################################################################################
 ```bash
-git clone https://github.com/rfinland/rook-ceph-charts.git
+git clone https://github.com/rfatolahzade/rook-ceph-charts.git
 cd ~/rook-ceph-charts/rook-ceph-cluster/
 helm install --namespace rook-ceph rook-ceph-cluster . -f values.yaml
 ```
@@ -193,7 +193,7 @@ kubectl get sc,pv,pvc -n rook-ceph
 
 #################################################################################
 ```bash
-git clone https://github.com/rfinland/ingress-sample.git
+git clone https://github.com/rfatolahzade/ingress-sample.git
 cd ~/ingress-sample
 chmod +x ingress-app.sh
 ./ingress-app.sh
@@ -210,7 +210,7 @@ curl http://demo.localdev.me:8080/
 
 #################################################################################
 ```bash
-git clone https://github.com/rfinland/loki.git
+git clone https://github.com/rfatolahzade/loki.git
 cd ~/loki
 chmod +x grafana.sh
 ./grafana.sh
@@ -241,7 +241,7 @@ cat $PWD/test-etcd.yaml
 
 #################################################################################
 ```bash
-git clone https://github.com/rfinland/Mariadb.git
+git clone https://github.com/rfatolahzade/Mariadb.git
 cd ~/Mariadb/
 chmod +x mariadb.sh
 ./mariadb.sh
